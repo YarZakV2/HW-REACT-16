@@ -1,23 +1,45 @@
-import { useState } from "react";
-
+import { useReducer } from "react";
 import Section from "./components/Section";
 import FeedbackOptions from "./components/FeedbackOptions";
 import Statistics from "./components/Statistics";
 import Notification from "./components/Notification";
 
+const initialState = {
+  good: 0,
+  neutral: 0,
+  bad: 0,
+};
+
+function feedbackReducer(state, action) {
+  switch (action.type) {
+    case "good":
+      return { ...state, good: state.good + 1 };
+    case "neutral":
+      return { ...state, neutral: state.neutral + 1 };
+    case "bad":
+      return { ...state, bad: state.bad + 1 };
+    default:
+      return state;
+  }
+}
+
+function useFeedback() {
+  return useReducer(feedbackReducer, initialState);
+}
+
 function App() {
-  const [good, setGood] = useState(0);
-  const [neutral, setNeutral] = useState(0);
-  const [bad, setBad] = useState(0);
+  const [state, dispatch] = useFeedback();
 
   const onLeaveFeedback = (option) => {
-    if (option === "good") setGood((g) => g + 1);
-    if (option === "neutral") setNeutral((n) => n + 1);
-    if (option === "bad") setBad((b) => b + 1);
+    dispatch({ type: option });
   };
 
+  const { good, neutral, bad } = state;
+
   const total = good + neutral + bad;
-  const positivePercentage = total ? Math.round((good / total) * 100) : 0;
+  const positivePercentage = total
+    ? Math.round((good / total) * 100)
+    : 0;
 
   return (
     <div>
